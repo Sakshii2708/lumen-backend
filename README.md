@@ -1,55 +1,100 @@
-# Lumen Backend
+# ⚡ Lumen AI Backend
 
-Node.js + Express backend service for **Lumen** AI chat assistant powered by Groq API (`llama-3.3-70b-versatile`).
+A high-performance **Node.js & Express** backend service for **Lumen**, an intelligent AI chat and summarization assistant powered by the **Groq API** (`llama-3.3-70b-versatile`).
+
+Designed to seamlessly integrate with modern frontend applications and web builders (e.g., **Lovable**, React, Next.js, Vue).
 
 ---
 
-## 🚀 Quick Start Instructions
+## 🚀 Features
 
-### 1. Installation
+- 💬 **AI Chat Endpoint (`/api/chat`)**: Multi-turn conversation support with custom system prompt context, powered by Groq's high-speed `llama-3.3-70b-versatile` model.
+- 📝 **Text Summarization Endpoint (`/api/summarize`)**: Intelligent, key-point text summarization for long articles, documents, or notes.
+- 🩺 **Health Check Endpoint (`/health`)**: Lightweight diagnostic endpoint for uptime monitoring.
+- 🌐 **Cross-Origin Resource Sharing (CORS)**: Pre-configured to allow seamless frontend integration across domains.
+- 🔐 **Secure Environment Handling**: Strict separation of credentials using `dotenv` to keep API keys out of source control.
+- 🛡️ **Robust Error Handling**: Structured JSON error responses with proper HTTP status codes.
 
-Navigate to the project folder and install dependencies:
+---
+
+## 🛠️ Tech Stack
+
+- **Runtime**: [Node.js](https://nodejs.org/) (ES Modules)
+- **Framework**: [Express.js](https://expressjs.com/)
+- **AI SDK**: Official [`groq-sdk`](https://www.npmjs.com/package/groq-sdk)
+- **AI Model**: `llama-3.3-70b-versatile` via [Groq Cloud](https://groq.com/)
+- **Middleware**: `cors`, `dotenv`, `express.json`
+
+---
+
+## 📁 Project Structure
+
+```text
+lumen-backend/
+├── server.js          # Express application entry point & API routes
+├── package.json        # Project metadata & npm dependencies
+├── package-lock.json   # Locked dependency tree
+├── .env.example        # Environment variable template
+├── .gitignore          # Git exclusion rules (node_modules, .env)
+└── README.md           # Documentation
+```
+
+---
+
+## 🔑 Environment Setup
+
+1. Copy `.env.example` to create your local `.env` file:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Configure your environment variables in `.env`:
+   ```env
+   # Required: Get your free API key from https://console.groq.com
+   GROQ_API_KEY=gsk_your_actual_groq_api_key_here
+
+   # Optional: Server listening port (default: 3000)
+   PORT=3000
+   ```
+
+> ⚠️ **Security Warning**: Never commit your `.env` file or hardcode your `GROQ_API_KEY` into source files.
+
+---
+
+## 💻 Local Quickstart
+
+### 1. Install Dependencies
 
 ```bash
-cd lumen-backend
 npm install
 ```
 
-### 2. Configure Environment Variables
+### 2. Start the Server
 
-Open `.env` (or copy `.env.example` to `.env`) and set your Groq API key:
-
-```env
-GROQ_API_KEY=your_actual_groq_api_key_here
-PORT=3000
-```
-
-> 🔑 Get a Groq API key for free from the [Groq Console](https://console.groq.com).
-
-### 3. Run the Server
-
-Start the server in production mode:
-
+**Production Mode:**
 ```bash
 npm start
 ```
 
-Or run in development mode (auto-reload on file changes in Node 18+):
-
+**Development Mode (Auto-reloading):**
 ```bash
 npm run dev
 ```
 
-The server will be available at `http://localhost:3000`.
+The server will start at `http://localhost:3000`.
 
 ---
 
-## 📡 API Endpoints
+## 📡 API Reference
 
-### 1. `GET /health`
-Verifies server health and status.
+### 1. Health Check
 
-**Response:**
+Verifies server status and availability.
+
+- **URL**: `/health`
+- **Method**: `GET`
+- **Response**: `200 OK`
+
 ```json
 {
   "status": "ok"
@@ -58,48 +103,83 @@ Verifies server health and status.
 
 ---
 
-### 2. `POST /api/chat`
-Generates a response from Lumen assistant using `llama-3.3-70b-versatile`.
+### 2. Chat Assistant
 
-**Request Body:**
+Generates a response from Lumen using multi-turn conversation context.
+
+- **URL**: `/api/chat`
+- **Method**: `POST`
+- **Headers**: `Content-Type: application/json`
+
+#### Request Body
 ```json
 {
-  "message": "Hello Lumen, what can you do?",
+  "message": "What can you help me with?",
   "conversationHistory": [
-    { "role": "user", "content": "Hi" },
-    { "role": "assistant", "content": "Hello! How can I help you today?" }
+    { "role": "user", "content": "Hi, I am Sakshi." },
+    { "role": "assistant", "content": "Hello Sakshi! How can I assist you today?" }
   ]
 }
 ```
 
-**Response:**
+#### Success Response (`200 OK`)
 ```json
 {
-  "reply": "Hello! I am Lumen, your AI assistant. I can answer questions, summarize long text, help with coding, and more!"
+  "reply": "Hello Sakshi! As Lumen, I can help answer questions, brainstorm ideas, analyze concepts, summarize long texts, and assist with coding or general knowledge. What would you like to work on today?"
+}
+```
+
+#### Error Response (`500 Internal Server Error`)
+```json
+{
+  "error": "Failed to generate response from Groq API.",
+  "message": "GROQ_API_KEY is not configured in environment."
 }
 ```
 
 ---
 
-### 3. `POST /api/summarize`
-Summarizes any given block of text.
+### 3. Text Summarization
 
-**Request Body:**
+Generates a concise summary for any given block of text.
+
+- **URL**: `/api/summarize`
+- **Method**: `POST`
+- **Headers**: `Content-Type: application/json`
+
+#### Request Body
 ```json
 {
-  "text": "Node.js is a cross-platform, open-source JavaScript runtime environment that executes JavaScript code outside a web browser. Node.js lets developers use JavaScript to write command line tools and for server-side scripting."
+  "text": "Node.js is an open-source, cross-platform JavaScript runtime environment that executes JavaScript code outside a web browser. Node.js lets developers use JavaScript to write command line tools and for server-side scripting to produce dynamic web page content before the page is sent to the user's web browser."
 }
 ```
 
-**Response:**
+#### Success Response (`200 OK`)
 ```json
 {
-  "summary": "Node.js is an open-source, cross-platform JavaScript runtime environment for server-side scripting and command-line tools."
+  "summary": "Node.js is an open-source, cross-platform JavaScript runtime that allows developers to run server-side scripts and build command-line tools outside the browser."
 }
 ```
 
 ---
 
-## 🔒 Security & CORS
-- **CORS** is enabled for cross-origin requests, allowing frontends hosted on platforms like **Lovable**, Vercel, or Netlify to connect smoothly.
-- **API Key Security**: The Groq API key is accessed strictly via `process.env.GROQ_API_KEY` and never exposed to the frontend.
+## 🚢 Deployment Guide
+
+This backend can be deployed to any hosting platform supporting Node.js (e.g. **Render**, **Railway**, **Vercel**, **Fly.io**).
+
+### Deploying to Render / Railway
+
+1. Push your repository to GitHub (`Sakshii2708/lumen-backend`).
+2. Create a new **Web Service** on [Render](https://render.com) or [Railway](https://railway.app).
+3. Connect your GitHub repository.
+4. Configure build settings:
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+5. Add `GROQ_API_KEY` under **Environment Variables** in your hosting dashboard.
+6. Copy your deployed web service URL (e.g., `https://lumen-backend.onrender.com`) to connect your frontend.
+
+---
+
+## 📄 License
+
+[MIT](LICENSE) © 2026 Lumen Team
